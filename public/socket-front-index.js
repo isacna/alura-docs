@@ -1,27 +1,37 @@
-import { insertLinkDocument, removeLinkDocument } from "./index.js";
+import { inserirLinkDocumento, removerLinkDocumento } from "./index.js";
+import { getCookie } from "./utils/cookies.js";
 
-const socket = io()
-
-socket.emit("getDocuments", (documents)=>{
-    documents.forEach((doc) => {
-        insertLinkDocument(doc.name)
-    })
+const socket = io("/usuarios",{
+  auth: {
+    token: getCookie("tokenJwt")
+  }
 });
 
-function emitAddDocument(name) {
-    socket.emit("add_document", name)
+socket.on("connect_error", (error) => {
+  alert(error)
+  window.location.href = "./login/index.html"
+})
+
+socket.emit("obter_documentos", (documentos) => {
+  documentos.forEach((documento) => {
+    inserirLinkDocumento(documento.nome);
+  });
+});
+
+function emitirAdicionarDocumento(nome) {
+  socket.emit("adicionar_documento", nome);
 }
 
-socket.on("add_document_interface", (name) => {
-    insertLinkDocument(name)
-})
+socket.on("adicionar_documento_interface", (nome) => {
+  inserirLinkDocumento(nome);
+});
 
-socket.on("document_exists", (name) => {
-    alert(`The document ${name} already exists`)
-})
+socket.on("documento_existente", (nome) => {
+  alert(`O documento ${nome} já existe!`);
+});
 
-socket.on("delete_document_success", (name) => {
-    removeLinkDocument(name)
-})
+socket.on("excluir_documento_sucesso", (nome) => {
+  removerLinkDocumento(nome);
+});
 
-export {emitAddDocument}
+export { emitirAdicionarDocumento };

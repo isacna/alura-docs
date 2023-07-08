@@ -1,32 +1,41 @@
-import { emitAddDocument } from "./socket-front-index.js";
+import { emitirAdicionarDocumento } from "./socket-front-index.js";
+import { getCookie, removeCookie } from "./utils/cookies.js";
 
-const listDocuments = document.getElementById("lista-documentos");
+const tokenJwt = getCookie("tokenJwt")
+
+const listaDocumentos = document.getElementById("lista-documentos");
 const form = document.getElementById("form-adiciona-documento");
-const inputDocument = document.getElementById("input-documento");
+const inputDocumento = document.getElementById("input-documento");
+const buttonLogout = document.getElementById("botao-logout")
 
-form.addEventListener("submit", (event) => {
-  event.preventDefault();
+buttonLogout.addEventListener("click", () => {
+  removeCookie("tokenJwt")
+  alert("Usuário deslogado com sucesso.")
+  window.location.href = "/login/index.html"
+})
 
-  emitAddDocument(inputDocument.value);
-  inputDocument.value = "";
+form.addEventListener("submit", (evento) => {
+  evento.preventDefault();
+  emitirAdicionarDocumento(inputDocumento.value);
+  inputDocumento.value = "";
 });
 
-function insertLinkDocument(nameDocument) {
-  listDocuments.innerHTML += `
-    <a 
-        href="documento.html?nome=${nameDocument}" 
-        class="list-group-item list-group-item-action"
-        id="documento-${nameDocument}"
+function inserirLinkDocumento(nomeDocumento) {
+  listaDocumentos.innerHTML += `
+    <a
+      href="/documento/index.html?nome=${nomeDocumento}"
+      class="list-group-item list-group-item-action"
+      id="documento-${nomeDocumento}"
     >
-        ${nameDocument}
+      ${nomeDocumento}
     </a>
-    `;
+  `;
 }
 
-function removeLinkDocument(nameDocument) {
-  const document = document.getElementById(`documento-${nameDocument}`);
+function removerLinkDocumento(nomeDocumento) {
+  const documento = document.getElementById(`documento-${nomeDocumento}`);
 
-  listDocuments.removeChild(document);
+  listaDocumentos.removeChild(documento);
 }
 
-export { insertLinkDocument, removeLinkDocument };
+export { inserirLinkDocumento, removerLinkDocumento };
